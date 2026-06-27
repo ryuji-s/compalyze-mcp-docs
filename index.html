@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compalyze MCP — 日本企業データを AI から使う開発者ガイド</title>
+<meta name="description" content="Compalyze MCP サーバーの接続方法・ツール一覧・認証・料金。法人番号ベースで日本企業を広く収録し、登記・財務・関係・役員などのデータを Claude などの AIエージェントから扱えます。">
+<link rel="canonical" href="https://ryuji-s.github.io/compalyze-mcp-docs/">
+<style>
+:root{--bg:#fff;--fg:#16213a;--muted:#5b6577;--line:#e6e9f0;--navy:#1a2b5e;--accent:#2563eb;--code:#0f172a;--codebg:#f4f6fb}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1118;--fg:#e7eaf2;--muted:#9aa3b5;--line:#262c38;--navy:#9bb4ff;--accent:#6f9bff;--codebg:#151a23}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans JP",sans-serif;line-height:1.7;font-size:15px}
+.wrap{max-width:880px;margin:0 auto;padding:32px 20px 90px}
+header{border-bottom:1px solid var(--line);padding-bottom:18px;margin-bottom:8px}
+h1{font-size:25px;margin:0 0 6px}h2{font-size:19px;margin:34px 0 10px;color:var(--navy)}h3{font-size:15px;margin:18px 0 6px}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.lead{color:var(--muted);font-size:15px}
+code{font-family:ui-monospace,Menlo,monospace;font-size:13px;background:var(--codebg);padding:1px 5px;border-radius:4px}
+pre{background:var(--codebg);border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.55}
+pre code{background:none;padding:0}
+table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--muted);font-size:12px;text-transform:uppercase}
+.note{border-left:4px solid var(--accent);background:rgba(37,99,235,.06);padding:10px 14px;border-radius:6px;margin:14px 0;font-size:14px}
+.btn{display:inline-block;background:var(--navy);color:#fff;padding:9px 16px;border-radius:8px;font-weight:600;margin:6px 8px 6px 0}
+.btn:hover{text-decoration:none;opacity:.92}
+footer{border-top:1px solid var(--line);margin-top:48px;padding-top:18px;color:var(--muted);font-size:13px}
+.tools td:first-child{white-space:nowrap;font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+</style>
+</head>
+<body><div class="wrap">
+
+<header>
+<h1>Compalyze MCP — 日本企業データを AI から使う</h1>
+<p class="lead">
+<a href="https://compalyze.co.jp">Compalyze</a> は、法人番号ベースで日本企業を広く収録し、<strong>登記・財務・企業間の関係・役員</strong>などのデータを、公式情報源（登記情報・EDINET・官報など）から構造化して提供する企業情報プラットフォームです。
+この MCP サーバーを使うと、Claude などの AI エージェントから直接これらの企業データを取得できます。
+</p>
+<a class="btn" href="https://compalyze.co.jp">compalyze.co.jp を見る</a>
+<a class="btn" href="https://mcp.compalyze.co.jp" style="background:#2563eb">MCP ダッシュボード / APIキー発行</a>
+</header>
+
+<h2>これは何か</h2>
+<p>
+Compalyze MCP は <a href="https://modelcontextprotocol.io/">Model Context Protocol</a> 準拠のリモート MCP サーバーです。
+「企業を探す（Discovery）」と「個社を深く知る（Intelligence）」の読み取りツール群を提供し、営業リスト作成・与信/取引先調査・競合や業界の分析・AI アシスタントからの企業データ取得などに使えます。
+Web で人が使う場合は <a href="https://compalyze.co.jp">compalyze.co.jp</a>（会社ページ・<a href="https://compalyze.co.jp/search">詳細検索</a>）をどうぞ。
+</p>
+
+<h2>クイックスタート（接続）</h2>
+<p>リモート HTTP トランスポートで接続します。<code>cpz_</code> で始まる API キーを <code>Authorization: Bearer</code> ヘッダで渡します。</p>
+
+<h3>Claude Code</h3>
+<pre><code>claude mcp add compalyze https://mcp.compalyze.co.jp/mcp \
+  --transport http \
+  --header "Authorization: Bearer cpz_xxxxxxxxxxxxxxxx"</code></pre>
+
+<h3>Claude Desktop（claude_desktop_config.json）</h3>
+<pre><code>{
+  "mcpServers": {
+    "compalyze": {
+      "type": "http",
+      "url": "https://mcp.compalyze.co.jp/mcp",
+      "headers": { "Authorization": "Bearer cpz_xxxxxxxxxxxxxxxx" }
+    }
+  }
+}</code></pre>
+
+<div class="note">
+API キーは <a href="https://mcp.compalyze.co.jp">MCP ダッシュボード</a> で発行します。キーは <code>cpz_</code> プレフィックス付きで、サーバー側にはハッシュのみ保存されます（平文は発行時のみ表示）。
+</div>
+
+<h2>認証と料金</h2>
+<ul>
+<li><strong>認証</strong>：API キー（<code>cpz_</code>）。HTTP モードは <code>Authorization</code> ヘッダ、stdio モードは <code>COMPALYZE_API_KEY</code> 環境変数。</li>
+<li><strong>料金</strong>：固定月額 ＋ クレジット従量制。ツール呼び出しごとにクレジットを消費します。プラン・残量は <a href="https://mcp.compalyze.co.jp">ダッシュボード</a>で確認できます。</li>
+</ul>
+
+<h2>ツール一覧</h2>
+<table class="tools"><thead><tr><th>ツール</th><th>カテゴリ</th><th>内容</th></tr></thead><tbody>
+<tr><td>search_companies</td><td>Discovery</td><td>社名・キーワードで企業を検索</td></tr>
+<tr><td>discover_companies</td><td>Discovery</td><td>業種・地域・条件で企業を絞り込み探索</td></tr>
+<tr><td>search_timeline</td><td>Discovery</td><td>イベント（登記変更・公告等）の横断検索</td></tr>
+<tr><td>get_company_register</td><td>Intelligence</td><td>登記情報・基本属性・変更履歴</td></tr>
+<tr><td>get_company_officers</td><td>Intelligence</td><td>役員・代表者</td></tr>
+<tr><td>get_company_financials</td><td>Intelligence</td><td>決算・財務データ（EDINET・官報由来）</td></tr>
+<tr><td>get_company_kpis</td><td>Intelligence</td><td>会社固有のKPI時系列（売上・店舗数等）</td></tr>
+<tr><td>get_company_events</td><td>Intelligence</td><td>イベント時系列（登記・知財・公告など）</td></tr>
+<tr><td>get_company_news</td><td>Intelligence</td><td>プレス・ニュース</td></tr>
+<tr><td>get_company_relations</td><td>Intelligence</td><td>資本・取引などの関係企業</td></tr>
+<tr><td>report_data_issue</td><td>Feedback</td><td>データの誤り・不足の報告</td></tr>
+</tbody></table>
+
+<h2>AI エージェント向けの従量決済（x402）</h2>
+<p>
+AI エージェント向けに、ウォレット決済（<a href="https://www.x402.org/">x402</a> / USDC on Base）による従量アクセスにも対応しています（エージェント市場経由）。決済は facilitator を介して処理されます。
+</p>
+
+<h2>データソース</h2>
+<p>
+登記情報・<a href="https://disclosure2.edinet-fsa.go.jp/">EDINET</a>・官報（決算公告）などの<strong>公式情報源</strong>をもとに、日本企業を広く収録して構造化しています（収録範囲はデータ種別により異なります）。
+個社の詳細は <a href="https://compalyze.co.jp">compalyze.co.jp</a> の会社ページで確認できます。
+</p>
+
+<footer>
+<p>
+Compalyze — 散在する企業情報を整理し、AI で活かす。<br>
+<a href="https://compalyze.co.jp">compalyze.co.jp</a> ・
+<a href="https://mcp.compalyze.co.jp">MCP ダッシュボード</a> ・
+<a href="https://compalyze.co.jp/search">詳細検索</a>
+</p>
+<p>運営：株式会社Compalyze</p>
+</footer>
+
+</div></body></html>
