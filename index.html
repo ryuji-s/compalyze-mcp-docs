@@ -53,19 +53,12 @@ Web で人が使う場合は <a href="https://compalyze.co.jp">compalyze.co.jp</
   --transport http \
   --header "Authorization: Bearer cpz_xxxxxxxxxxxxxxxx"</code></pre>
 
-<h3>Claude Desktop（claude_desktop_config.json）</h3>
-<pre><code>{
-  "mcpServers": {
-    "compalyze": {
-      "type": "http",
-      "url": "https://mcp.compalyze.co.jp/mcp",
-      "headers": { "Authorization": "Bearer cpz_xxxxxxxxxxxxxxxx" }
-    }
-  }
-}</code></pre>
+<h3>Claude Desktop / ChatGPT（コネクタ・OAuth）</h3>
+<p>設定からカスタムコネクタ（リモート MCP）を追加し、URL に <code>https://mcp.compalyze.co.jp/mcp</code> を指定します。認証画面が開くので、<a href="https://mcp.compalyze.co.jp">ダッシュボード</a>で発行した API キー（<code>cpz_</code>）を入力すると接続できます（OAuth 2.1 / PKCE 対応）。</p>
 
 <div class="note">
-API キーは <a href="https://mcp.compalyze.co.jp">MCP ダッシュボード</a> で発行します。キーは <code>cpz_</code> プレフィックス付きで、サーバー側にはハッシュのみ保存されます（平文は発行時のみ表示）。
+API キーは <a href="https://mcp.compalyze.co.jp">MCP ダッシュボード</a> で発行します。キーは <code>cpz_</code> プレフィックス付きで、サーバー側にはハッシュのみ保存されます（平文は発行時のみ表示）。<br>
+なお <code>https://mcp.compalyze.co.jp/mcp</code> をブラウザで直接開くと <code>Invalid or missing session ID</code> が返りますが、これは正常です（MCP はクライアントからの <code>initialize</code> でセッションを確立します）。
 </div>
 
 <h2>認証と料金</h2>
